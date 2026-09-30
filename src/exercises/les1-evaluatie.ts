@@ -54,7 +54,7 @@ students.forEach(([naam, voornaam, nl, wi, fr], i) => {
 export const les1Evaluatie: Exercise = {
   id: 'les1-evaluatie',
   version: 2,
-  title: 'Evaluatie 1 LOBR',
+  title: 'Basisformules: SOM, GEMIDDELDE, MEDIAAN, MIN en MAX',
   intro:
     'De puntenlijst van klas 1 LOBR staat klaar. Vul de nummers aan, bereken totalen en statistieken met functies, en geef de getallen de juiste notatie.',
   sheet: {
