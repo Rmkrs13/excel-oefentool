@@ -19,13 +19,13 @@ const students: Array<[string, string, number, number, number]> = [
 
 const cells: Record<A1, CellData> = {
   A1: { raw: 'klas:', style: { bold: true } },
-  B1: { raw: '1 Balo', style: { bold: true } },
+  B1: { raw: '1 LOBR', style: { bold: true } },
   D1: { raw: 'Periode:', style: { bold: true } },
   F1: { raw: 'jan-17', style: { bold: true } },
   A2: { raw: 'Evaluatie Januari 2017', style: { bold: true } },
-  D3: { raw: 'Nederlands' },
-  E3: { raw: 'Wiskunde' },
-  F3: { raw: 'Frans' },
+  D3: { raw: 'Didactiek' },
+  E3: { raw: 'Anatomie' },
+  F3: { raw: 'Gymnastiek' },
   G3: { raw: 'Totaal' },
   A4: { raw: 'Nr', style: { bold: true } },
   B4: { raw: 'Naam', style: { bold: true } },
@@ -53,10 +53,10 @@ students.forEach(([naam, voornaam, nl, wi, fr], i) => {
 
 export const les1Evaluatie: Exercise = {
   id: 'les1-evaluatie',
-  version: 1,
-  title: 'Evaluatie 1 Balo',
+  version: 2,
+  title: 'Evaluatie 1 LOBR',
   intro:
-    'De puntenlijst van klas 1 Balo staat klaar. Vul de nummers aan, bereken totalen en statistieken met functies, en geef de getallen de juiste notatie.',
+    'De puntenlijst van klas 1 LOBR staat klaar. Vul de nummers aan, bereken totalen en statistieken met functies, en geef de getallen de juiste notatie.',
   sheet: {
     rows: 26,
     cols: 9,
@@ -91,13 +91,13 @@ export const les1Evaluatie: Exercise = {
     {
       id: 'gemiddelde',
       title: 'Gemiddelde per vak',
-      text: 'Bereken in **D19** het gemiddelde van Nederlands met **GEMIDDELDE** en trek de formule door naar rechts tot **G19**.',
+      text: 'Bereken in **D19** het gemiddelde van Didactiek met **GEMIDDELDE** en trek de formule door naar rechts tot **G19**.',
       checks: [{ type: 'fillPattern', range: 'D19:G19', anchor: 'D19', formula: '=GEMIDDELDE(D5:D18)' }],
     },
     {
       id: 'mediaan',
       title: 'Mediaan per vak',
-      text: 'Bereken in **D20** de mediaan van Nederlands met **MEDIAAN** en trek door tot **G20**.',
+      text: 'Bereken in **D20** de mediaan van Didactiek met **MEDIAAN** en trek door tot **G20**.',
       hint: 'De mediaan is de middelste waarde. Bij een even aantal is het het gemiddelde van de twee middelste.',
       checks: [{ type: 'fillPattern', range: 'D20:G20', anchor: 'D20', formula: '=MEDIAAN(D5:D18)' }],
     },
