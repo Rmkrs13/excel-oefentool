@@ -3,7 +3,7 @@ import { SheetEngine } from '../engine/engine';
 import type { A1, CellData, DisplayValue } from '../exercises/types';
 import { parseA1 } from '../engine/address';
 import { makeCheckContext } from './context';
-import { canonicalFormula, functionsUsed, hasNested, hasRef } from './formulaUtils';
+import { autoCloseParens, canonicalFormula, functionsUsed, hasNested, hasRef } from './formulaUtils';
 import { runCheck } from './runChecks';
 
 function build(cells: Record<A1, CellData>) {
@@ -24,6 +24,17 @@ describe('formulaUtils', () => {
     expect(hasRef('=B21/$G$21', '$G$21')).toBe(true);
     expect(hasRef('=B21/G21', '$G$21')).toBe(false);
     expect(hasRef('=B11*B$30', 'B$30')).toBe(true);
+  });
+});
+
+describe('autoCloseParens', () => {
+  it('vult sluithaakjes aan', () => {
+    expect(autoCloseParens('=SOM(D5:F5')).toBe('=SOM(D5:F5)');
+    expect(autoCloseParens('=AFRONDEN(GEMIDDELDE(B2:D5);0')).toBe('=AFRONDEN(GEMIDDELDE(B2:D5);0)');
+    expect(autoCloseParens('=AFRONDEN(GEMIDDELDE(B2:D5')).toBe('=AFRONDEN(GEMIDDELDE(B2:D5))');
+    expect(autoCloseParens('=SOM(D5:F5)')).toBe('=SOM(D5:F5)');
+    expect(autoCloseParens('=ALS(A1="(";1;0')).toBe('=ALS(A1="(";1;0)');
+    expect(autoCloseParens('hallo(')).toBe('hallo(');
   });
 });
 

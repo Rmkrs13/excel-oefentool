@@ -9,6 +9,7 @@ import { makeCheckContext } from '../checks/context';
 import { runStep } from '../checks/runChecks';
 import { debounce, loadProgress, saveProgress, clearProgress, saveSummary, clearSummary } from './persistence';
 import { explainError } from '../engine/hf';
+import { autoCloseParens } from '../checks/formulaUtils';
 
 export interface Selection {
   anchor: Addr;
@@ -169,7 +170,7 @@ export const useSheetStore = create<SheetStore>((set, get) => {
     commitEdit(move) {
       const { editing } = get();
       if (!editing) return true;
-      const text = editing.text;
+      const text = autoCloseParens(editing.text);
       if (text.startsWith('=') && text.length > 1 && !getEngine().validateFormula(text)) {
         set({ editing: { ...editing, error: 'Er is een probleem met deze formule. Controleer haakjes en puntkomma’s.' } });
         return false;

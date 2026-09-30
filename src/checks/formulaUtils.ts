@@ -48,3 +48,19 @@ export function refsIn(canonical: string): string[] {
 export function escapeRe(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+/**
+ * Vult ontbrekende sluithaakjes aan, zoals Excel doet bij het bevestigen van een formule.
+ * Haakjes binnen stringliterals tellen niet mee.
+ */
+export function autoCloseParens(formula: string): string {
+  if (!formula.startsWith('=')) return formula;
+  let depth = 0;
+  let inString = false;
+  for (const ch of formula) {
+    if (ch === '"') inString = !inString;
+    else if (!inString && ch === '(') depth++;
+    else if (!inString && ch === ')' && depth > 0) depth--;
+  }
+  return depth > 0 ? formula + ')'.repeat(depth) : formula;
+}

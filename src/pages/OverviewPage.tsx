@@ -32,9 +32,6 @@ export function OverviewPage() {
           );
         })}
       </div>
-      <footer className="ov-footer">
-        Werkt zoals een Nederlandstalige Excel: functies zoals <code>SOM</code>, argumenten gescheiden met <code>;</code>, decimalen met <code>,</code>.
-      </footer>
     </div>
   );
 }
