@@ -32,6 +32,12 @@ export function OverviewPage() {
           );
         })}
       </div>
+      <footer className="ov-footer">
+        &copy; {new Date().getFullYear()}{' '}
+        <a href="https://www.linkedin.com/in/lars-rmkrs/" target="_blank" rel="noopener noreferrer">
+          Lars Raeymaekers
+        </a>
+      </footer>
     </div>
   );
 }

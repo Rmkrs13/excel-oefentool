@@ -120,6 +120,13 @@ code {
   color: var(--muted);
   font-size: 13px;
 }
+.ov-footer a {
+  color: var(--green);
+  text-decoration: none;
+}
+.ov-footer a:hover {
+  text-decoration: underline;
+}
 
 /* ---------- oefeningpagina ---------- */
 .exercise-page {
