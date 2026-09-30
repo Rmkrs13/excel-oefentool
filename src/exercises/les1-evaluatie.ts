@@ -21,8 +21,8 @@ const cells: Record<A1, CellData> = {
   A1: { raw: 'klas:', style: { bold: true } },
   B1: { raw: '1 LOBR', style: { bold: true } },
   D1: { raw: 'Periode:', style: { bold: true } },
-  F1: { raw: 'jan-17', style: { bold: true } },
-  A2: { raw: 'Evaluatie Januari 2017', style: { bold: true } },
+  F1: { raw: 'januari', style: { bold: true } },
+  A2: { raw: 'Evaluatie januari', style: { bold: true } },
   D3: { raw: 'Didactiek' },
   E3: { raw: 'Anatomie' },
   F3: { raw: 'Gymnastiek' },
@@ -53,7 +53,7 @@ students.forEach(([naam, voornaam, nl, wi, fr], i) => {
 
 export const les1Evaluatie: Exercise = {
   id: 'les1-evaluatie',
-  version: 2,
+  version: 3,
   title: 'Basisformules: SOM, GEMIDDELDE, MEDIAAN, MIN en MAX',
   intro:
     'De puntenlijst van klas 1 LOBR staat klaar. Vul de nummers aan, bereken totalen en statistieken met functies, en geef de getallen de juiste notatie.',
