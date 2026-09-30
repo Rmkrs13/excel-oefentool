@@ -74,3 +74,20 @@ export function clearSummary(exerciseId: string): void {
     /* negeren */
   }
 }
+
+export function loadLessonOpen(lessonId: string): boolean | null {
+  try {
+    const v = localStorage.getItem(PREFIX + 'lesson-open:' + lessonId);
+    return v === null ? null : v === '1';
+  } catch {
+    return null;
+  }
+}
+
+export function saveLessonOpen(lessonId: string, open: boolean): void {
+  try {
+    localStorage.setItem(PREFIX + 'lesson-open:' + lessonId, open ? '1' : '0');
+  } catch {
+    /* negeren */
+  }
+}

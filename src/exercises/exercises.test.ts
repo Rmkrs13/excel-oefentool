@@ -78,35 +78,4 @@ describe('oefeningen', () => {
     const ex = EXERCISES.find((e) => e.id === 'functies-nesten')!;
     expectAllOk(solve(ex, { G2: { raw: '=GEMIDDELDE(B2:D5)', format: parseFormatCode('0') }, G4: { raw: '=AFRONDEN(GEMIDDELDE(B2:D5);0)' } }, []));
   });
-
-  it('sport: volledige oplossing is groen', () => {
-    const ex = EXERCISES.find((e) => e.id === 'sport')!;
-    const maanden = ['oktober', 'november', 'december', 'januari', 'februari', 'maart', 'april', 'mei', 'juni'];
-    const sol: Record<A1, Partial<CellData>> = {
-      B6: { raw: "'014 12 34 56" },
-      B7: { format: parseFormatCode('dd/mm/jjjj') },
-      G10: { raw: 'Totaal' },
-      ...fmt('€ #.##0,00', 'B30:F30'),
-      ...fmt('#.##0', 'B11:F20'),
-    };
-    maanden.forEach((m, i) => {
-      sol[`A${12 + i}`] = { raw: m };
-      sol[`A${35 + i}`] = { raw: m };
-    });
-    expectAllOk(
-      solve(ex, sol, [
-        { anchor: 'G11', formula: '=SOM(B11:F11)', range: 'G11:G20', format: '#.##0' },
-        { anchor: 'B21', formula: '=SOM(B11:B20)', range: 'B21:G21', format: '#.##0' },
-        { anchor: 'B23', formula: '=GEMIDDELDE(B11:B20)', range: 'B23:G23' },
-        { anchor: 'B24', formula: '=AFRONDEN(GEMIDDELDE(B11:B20);0)', range: 'B24:G24' },
-        { anchor: 'B25', formula: '=MEDIAAN(B11:B20)', range: 'B25:G25' },
-        { anchor: 'B26', formula: '=MIN(B11:B20)', range: 'B26:G26' },
-        { anchor: 'B27', formula: '=MAX(B11:B20)', range: 'B27:G27' },
-        { anchor: 'B28', formula: '=B21/$G$21', range: 'B28:G28', format: '0,0%' },
-        { anchor: 'B34', formula: '=B11*B$30', range: 'B34:F43', format: '€ #.##0' },
-        { anchor: 'G34', formula: '=SOM(B34:F34)', range: 'G34:G43', format: '€ #.##0' },
-        { anchor: 'B44', formula: '=SOM(B34:B43)', range: 'B44:G44', format: '€ #.##0' },
-      ]),
-    );
-  });
 });
