@@ -65,6 +65,8 @@ export interface EditState {
   pointRef?: { start: number; end: number };
   /** Cel die met de pijltjes wordt aangewezen in point-modus. */
   pointCursor?: Addr;
+  /** Ankercel van het aangewezen bereik (Shift+pijltjes of Shift+klik breidt uit vanaf hier). */
+  pointAnchor?: Addr;
   autocomplete?: { items: string[]; index: number; tokenStart: number };
   error?: string;
 }

@@ -67,8 +67,10 @@ export function useGridInteraction() {
       const pointable = ed.text.startsWith('=') && (ed.pointRef || isRefInsertPosition(ed.text, ed.caret));
       if (pointable) {
         e.preventDefault(); // focus blijft in de editor
-        drag.current = { mode: 'point', anchor: a };
-        insertRangeRef(a, a);
+        // Shift+klik: bereik uitbreiden vanaf het anker van de vorige verwijzing.
+        const anchor = e.shiftKey && ed.pointAnchor ? ed.pointAnchor : a;
+        drag.current = { mode: 'point', anchor };
+        insertRangeRef(anchor, a);
         return;
       }
       if (!s.commitEdit('none')) {

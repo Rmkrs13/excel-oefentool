@@ -15,7 +15,7 @@ export function SelectionOverlay({ geometry, onFillHandleMouseDown }: Props) {
   const rect = rangeRect(geometry, range);
   const active = rangeRect(geometry, { start: selection.anchor, end: selection.anchor });
   const multi = !sameAddr(selection.anchor, selection.focus);
-  const pointRect = editing?.pointCursor ? rangeRect(geometry, { start: editing.pointCursor, end: editing.pointCursor }) : null;
+  const pointRect = editing?.pointCursor ? rangeRect(geometry, { start: editing.pointAnchor ?? editing.pointCursor, end: editing.pointCursor }) : null;
 
   return (
     <>

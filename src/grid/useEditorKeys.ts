@@ -5,7 +5,7 @@ import { functionTokenAtCaret, isRefInsertPosition, refTokenAtCaret } from './ed
 import { matchFunctions, TAUGHT_FUNCTIONS } from './editing/autocomplete';
 import { cycleAbsolute } from './editing/f4';
 import { allFunctionNames } from '../engine/hf';
-import { rangeToA1, toA1 } from '../engine/address';
+import { rangeToA1 } from '../engine/address';
 
 /** Berekent de autocomplete-toestand voor een tekst/caret. */
 export function computeAutocomplete(text: string, caret: number, allowed?: string[]): EditState['autocomplete'] {
@@ -42,7 +42,7 @@ export function useEditorKeys(inputRef: RefObject<HTMLInputElement | null>, sour
         s.updateEdit({ caret, autocomplete: computeAutocomplete(text, caret, allowed) });
         return;
       }
-      s.updateEdit({ text, caret, source, pointRef: undefined, pointCursor: undefined, error: undefined, autocomplete: computeAutocomplete(text, caret, allowed) });
+      s.updateEdit({ text, caret, source, pointRef: undefined, pointCursor: undefined, pointAnchor: undefined, error: undefined, autocomplete: computeAutocomplete(text, caret, allowed) });
     },
     [allowed, source],
   );
@@ -130,7 +130,9 @@ export function useEditorKeys(inputRef: RefObject<HTMLInputElement | null>, sour
             row: Math.min(Math.max(0, from.row + dr), (ex?.sheet.rows ?? 50) - 1),
             col: Math.min(Math.max(0, from.col + dc), (ex?.sheet.cols ?? 12) - 1),
           };
-          insertRef(toA1(cursor), cursor);
+          // Shift+pijltje: bereik uitbreiden vanaf het anker (zoals in Excel).
+          const anchor = e.shiftKey && ed.pointCursor ? (ed.pointAnchor ?? ed.pointCursor) : cursor;
+          insertRangeRef(anchor, cursor);
           return;
         }
         if (ed.mode === 'enter') {
@@ -163,16 +165,16 @@ export function acceptSuggestion(name: string): void {
 }
 
 /** Voegt een verwijzing in op de caret of vervangt de vorige point-verwijzing. */
-export function insertRef(ref: string, cursor?: { row: number; col: number }): void {
+export function insertRef(ref: string, cursor?: { row: number; col: number }, anchor?: { row: number; col: number }): void {
   const s = useSheetStore.getState();
   const ed = s.editing;
   if (!ed) return;
   const start = ed.pointRef ? ed.pointRef.start : ed.caret;
   const end = ed.pointRef ? ed.pointRef.end : ed.caret;
   const text = ed.text.slice(0, start) + ref + ed.text.slice(end);
-  s.updateEdit({ text, caret: start + ref.length, pointRef: { start, end: start + ref.length }, pointCursor: cursor, autocomplete: undefined });
+  s.updateEdit({ text, caret: start + ref.length, pointRef: { start, end: start + ref.length }, pointCursor: cursor, pointAnchor: anchor ?? cursor, autocomplete: undefined });
 }
 
 export function insertRangeRef(anchor: { row: number; col: number }, focus: { row: number; col: number }): void {
-  insertRef(rangeToA1({ start: anchor, end: focus }), focus);
+  insertRef(rangeToA1({ start: anchor, end: focus }), focus, anchor);
 }
