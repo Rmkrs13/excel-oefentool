@@ -45,6 +45,10 @@ export function OverviewPage() {
       <header className="ov-header">
         <h1>Excel oefenen</h1>
         <p>Oefen de technieken uit de les in een werkblad in je browser. Je werk wordt automatisch bewaard in deze browser.</p>
+        <p className="ov-note">
+          Deze tool dekt enkel de belangrijkste logica en formules. Lay-out, celopmaak, grafieken en draaitabellen kun je hier niet
+          oefenen, maar ze zijn wel belangrijke leerstof voor het examen: oefen die in Excel zelf.
+        </p>
       </header>
       {LESSONS.map((lesson) => {
         const p = lessonProgress(lesson);

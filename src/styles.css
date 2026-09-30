@@ -53,7 +53,15 @@ code {
 }
 .ov-header p {
   color: var(--muted);
-  margin: 0 0 24px;
+  margin: 0 0 12px;
+}
+.ov-note {
+  padding: 10px 14px;
+  border-left: 4px solid var(--partial);
+  background: #fff8ec;
+  border-radius: 0 6px 6px 0;
+  color: #5a4a2a !important;
+  margin-bottom: 24px !important;
 }
 .lesson {
   border: 1px solid var(--border);
