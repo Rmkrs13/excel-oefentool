@@ -91,6 +91,23 @@ describe('SheetEngine', () => {
     expect(e.getValue(B, parseA1('A3')).value).toBe(42625);
     e.destroy();
   });
+  it('kent de tekst- en financiële functies uit les 3', () => {
+    const e = new SheetEngine();
+    e.load(one({
+      A1: { raw: 'Tim' }, B1: { raw: 'Konings' },
+      C1: { raw: '=HOOFDLETTERS(LINKS(A1;2)&DEEL(B1;2;2))&TEKST(LENGTE(B1);"00")' },
+      C2: { raw: '=KLEINE.LETTERS(A1&"."&B1&"@firma.com")' },
+      C3: { raw: '=BET(0,02/12;240;300000;0;1)' },
+      C4: { raw: '=GROOTSTE(D1:D3;2)' }, D1: { raw: '5' }, D2: { raw: '9' }, D3: { raw: '1' },
+      C5: { raw: '=GEMIDDELDE.ALS(D1:D3;">2")' },
+    }));
+    expect(e.getValue(B, parseA1('C1')).value).toBe('TION07');
+    expect(e.getValue(B, parseA1('C2')).value).toBe('tim.konings@firma.com');
+    expect(e.getValue(B, parseA1('C3')).value).toBeCloseTo(-1515.12, 2);
+    expect(e.getValue(B, parseA1('C4')).value).toBe(5);
+    expect(e.getValue(B, parseA1('C5')).value).toBe(7);
+    e.destroy();
+  });
   it('rekent over meerdere tabbladen en met zoekfuncties', () => {
     const e = new SheetEngine();
     e.load([

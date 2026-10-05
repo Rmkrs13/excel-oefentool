@@ -1,5 +1,9 @@
 /** Functies in de volgorde waarin ze in de les aan bod komen. */
-export const TAUGHT_FUNCTIONS = ['SOM', 'GEMIDDELDE', 'MEDIAAN', 'MIN', 'MAX', 'AFRONDEN', 'AANTALARG', 'AANTAL', 'ALS', 'AANTAL.ALS', 'X.ZOEKEN', 'VERT.ZOEKEN'];
+export const TAUGHT_FUNCTIONS = [
+  'SOM', 'GEMIDDELDE', 'MEDIAAN', 'MIN', 'MAX', 'AFRONDEN', 'AANTALARG', 'AANTAL',
+  'ALS', 'AANTAL.ALS', 'X.ZOEKEN', 'VERT.ZOEKEN',
+  'SOM.ALS', 'GEMIDDELDE.ALS', 'GROOTSTE', 'KLEINSTE', 'BET', 'LINKS', 'RECHTS', 'DEEL', 'LENGTE', 'HOOFDLETTERS', 'KLEINE.LETTERS', 'TEKST',
+];
 
 export const MAX_SUGGESTIONS = 8;
 

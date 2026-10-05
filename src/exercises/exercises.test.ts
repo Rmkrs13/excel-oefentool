@@ -140,4 +140,46 @@ describe('oefeningen', () => {
     expect(alt.find((x) => x.id === 'woonplaats')!.r.ok).toBe(false);
     expect(alt.find((x) => x.id === 'woonplaats')!.r.partial).toBe(true);
   });
+
+  it('les3-voorwaarde: volledige oplossing is groen', () => {
+    const ex = EXERCISES.find((e) => e.id === 'les3-voorwaarde')!;
+    expectAllOk(solve(ex, { 'SOM.ALS!F2': { raw: '=SOM.ALS(A2:A7;D2;B2:B7)' }, "'GEMIDDELDE.ALS 1'!B5": { raw: '=GEMIDDELDE.ALS(B1:I1;B4;B2:I2)' }, "'GEMIDDELDE.ALS 2'!B5": { raw: '=GEMIDDELDE.ALS(B2:I2;B4)' } }, []));
+    const man = solve(ex, { "'GEMIDDELDE.ALS 1'!B4": { raw: 'man' }, "'GEMIDDELDE.ALS 1'!B5": { raw: '=GEMIDDELDE.ALS(B1:I1;B4;B2:I2)' } }, []);
+    expect(man.find((x) => x.id === 'gemals1')!.r.ok).toBe(true);
+  });
+
+  it('les3-grootste-kleinste: volledige oplossing is groen', () => {
+    const ex = EXERCISES.find((e) => e.id === 'les3-grootste-kleinste')!;
+    expectAllOk(
+      solve(ex, {}, [
+        { anchor: 'GROOTSTE!B3', formula: '=GROOTSTE($B$1:$I$1;B2)', range: 'GROOTSTE!B3:I3' },
+        { anchor: 'KLEINSTE!B3', formula: '=KLEINSTE($B$1:$I$1;B2)', range: 'KLEINSTE!B3:I3' },
+      ]),
+    );
+    const zonderDollar = solve(ex, {}, [{ anchor: 'GROOTSTE!B3', formula: '=GROOTSTE(B1:I1;B2)', range: 'GROOTSTE!B3:I3' }]);
+    expect(zonderDollar.find((x) => x.id === 'grootste')!.r.ok).toBe(false);
+  });
+
+  it('les3-xzoeken: volledige oplossing is groen', () => {
+    const ex = EXERCISES.find((e) => e.id === 'les3-xzoeken')!;
+    expectAllOk(solve(ex, { J1: { raw: 'E' }, J2: { raw: '=X.ZOEKEN(J1;B1:G1;B2:G2)', format: parseFormatCode('0%') }, J5: { raw: '=X.ZOEKEN(J4;B2:G2;B1:G1)' } }, []));
+  });
+
+  it('les3-bet: volledige oplossing is groen, ook met positief bedrag', () => {
+    const ex = EXERCISES.find((e) => e.id === 'les3-bet')!;
+    expectAllOk(solve(ex, { 'Lenen!B5': { raw: '=BET(B2/12;B3*12;-B1;0;1)', format: parseFormatCode('€ #.##0,00') }, 'Sparen!B5': { raw: '=BET(B2/12;B3*12;0;B1;1)', format: parseFormatCode('€ #.##0,00') } }, []));
+    const jaar = solve(ex, { 'Lenen!B5': { raw: '=BET(B2;B3;B1;0;1)', format: parseFormatCode('€ #.##0,00') } }, []);
+    expect(jaar.find((x) => x.id === 'lenen')!.r.ok).toBe(false);
+  });
+
+  it('les3-tekst: volledige oplossing is groen', () => {
+    const ex = EXERCISES.find((e) => e.id === 'les3-tekst')!;
+    expectAllOk(
+      solve(ex, {}, [
+        { anchor: 'D3', formula: '=HOOFDLETTERS(LINKS(A3;2)&DEEL(B3;2;2))&TEKST(LENGTE(B3);"00")', range: 'D3:D11' },
+        { anchor: 'E3', formula: '=KLEINE.LETTERS(A3&"."&B3&"@firma.com")', range: 'E3:E11' },
+        { anchor: 'F3', formula: '=X.ZOEKEN(C3;$C$13:$C$14;$B$13:$B$14)&" "&LINKS(A3;1)&". "&B3', range: 'F3:F11' },
+      ]),
+    );
+  });
 });

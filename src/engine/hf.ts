@@ -7,6 +7,8 @@ const nlBE = {
   ...nlNL,
   langCode: LANG,
   errors: { ...nlNL.errors, DIV_BY_ZERO: '#DEEL/0!' },
+  // Het nlNL-pakket vertaalt LEN verkeerd ('PITUUS'); in Excel heet die LENGTE.
+  functions: { ...nlNL.functions, LEN: 'LENGTE' },
 };
 
 let registered = false;
