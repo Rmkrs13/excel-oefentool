@@ -36,6 +36,20 @@ function expectedBudget(ctx: CheckContext): number | null {
   return null;
 }
 
+/**
+ * Klopt de zoekformule in `cell` met de huidige ploeg in C2?
+ * Bestaat de ploeg: de cel toont haar budget. Bestaat ze niet: de cel geeft #N/B (of `fallback`, als die is opgegeven).
+ * Zo blijven de stappen juist, welke ploeg er ook in C2 staat.
+ */
+function lookupOk(ctx: CheckContext, cell: string, fallback?: string): boolean {
+  const expected = expectedBudget(ctx);
+  if (expected !== null) return ctx.value(cell) === expected;
+  if (fallback !== undefined) return String(ctx.value(cell) ?? '').trim().toLowerCase() === fallback;
+  return ctx.errorText(cell) === '#N/B';
+}
+
+const LOOKUP_MSG = (cell: string) => `${cell} geeft niet het budget van de ploeg in C2 (of #N/B als die ploeg niet in de tabel staat).`;
+
 export const les2Zoeken: Exercise = {
   id: 'les2-zoeken',
   version: 1,
@@ -50,12 +64,7 @@ export const les2Zoeken: Exercise = {
       hint: '`=X.ZOEKEN(C2;E5:E8;F5:F8)`. Het zoekbereik en het resultaatbereik zijn even lang en liggen naast elkaar.',
       checks: [
         { type: 'usesFunction', cell: 'C5', fn: 'X.ZOEKEN' },
-        {
-          type: 'predicate',
-          label: 'C5 geeft het budget van de ploeg in C2',
-          message: 'C5 geeft niet het budget van de ploeg die in C2 staat.',
-          test: (ctx) => expectedBudget(ctx) !== null && ctx.value('C5') === expectedBudget(ctx),
-        },
+        { type: 'predicate', label: 'C5 geeft het budget van de ploeg in C2', message: LOOKUP_MSG('C5'), test: (ctx) => lookupOk(ctx, 'C5') },
       ],
     },
     {
@@ -68,8 +77,8 @@ export const les2Zoeken: Exercise = {
         {
           type: 'predicate',
           label: 'C6 geeft het budget van de ploeg in C2',
-          message: 'C6 geeft niet het budget van de ploeg die in C2 staat. Staat ONWAAR (of 0) als vierde argument?',
-          test: (ctx) => expectedBudget(ctx) !== null && ctx.value('C6') === expectedBudget(ctx),
+          message: LOOKUP_MSG('C6') + ' Staat ONWAAR (of 0) als vierde argument?',
+          test: (ctx) => lookupOk(ctx, 'C6'),
         },
       ],
     },
@@ -81,17 +90,14 @@ export const les2Zoeken: Exercise = {
         {
           type: 'predicate',
           label: 'C2 bevat een andere ploeg dan Bayern M',
-          message: 'Typ in C2 een andere ploeg uit de tabel (Real Madrid, AC Milan of Chelsea).',
-          test: (ctx) => {
-            const club = String(ctx.value('C2') ?? '').trim().toLowerCase();
-            return club !== 'bayern m' && expectedBudget(ctx) !== null;
-          },
+          message: 'Typ in C2 een andere ploeg (bijvoorbeeld Chelsea).',
+          test: (ctx) => String(ctx.value('C2') ?? '').trim().toLowerCase() !== 'bayern m' && ctx.value('C2') !== null && ctx.value('C2') !== '',
         },
         {
           type: 'predicate',
           label: 'C5 en C6 volgen mee',
-          message: 'C5 en C6 tonen niet het budget van de nieuwe ploeg.',
-          test: (ctx) => expectedBudget(ctx) !== null && ctx.value('C5') === expectedBudget(ctx) && ctx.value('C6') === expectedBudget(ctx),
+          message: 'C5 en C6 volgen de ploeg in C2 niet. Verwijzen beide formules naar C2?',
+          test: (ctx) => lookupOk(ctx, 'C5') && lookupOk(ctx, 'C6'),
         },
       ],
     },
@@ -104,9 +110,15 @@ export const les2Zoeken: Exercise = {
         { type: 'usesFunction', cell: 'C7', fn: 'X.ZOEKEN' },
         {
           type: 'predicate',
-          label: 'C7 toont "niet gevonden" voor een onbekende ploeg',
-          message: 'Typ in C2 een ploeg die niet in de tabel staat; C7 moet dan "niet gevonden" tonen.',
-          test: (ctx) => expectedBudget(ctx) === null && String(ctx.value('C7') ?? '').trim().toLowerCase() === 'niet gevonden',
+          label: 'C7 heeft "niet gevonden" als vierde argument',
+          message: 'Geef in C7 de tekst "niet gevonden" (tussen aanhalingstekens) als vierde argument van X.ZOEKEN.',
+          test: (ctx) => /"niet gevonden"/i.test(ctx.raw('C7')),
+        },
+        {
+          type: 'predicate',
+          label: 'C7 toont het budget, of "niet gevonden" voor een onbekende ploeg',
+          message: 'C7 toont niet het juiste resultaat. Typ in C2 een ploeg die niet in de tabel staat (bv. Ajax): C7 moet dan "niet gevonden" tonen.',
+          test: (ctx) => lookupOk(ctx, 'C7', 'niet gevonden'),
         },
       ],
     },

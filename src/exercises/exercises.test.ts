@@ -111,11 +111,14 @@ describe('oefeningen', () => {
   it('les2-zoeken: oplossing is groen, ook met onbekende ploeg', () => {
     const ex = EXERCISES.find((e) => e.id === 'les2-zoeken')!;
     const sol = { C5: { raw: '=X.ZOEKEN(C2;E5:E8;F5:F8)' }, C6: { raw: '=VERT.ZOEKEN(C2;E5:F8;2;ONWAAR)' }, C7: { raw: '=X.ZOEKEN(C2;E5:E8;F5:F8;"niet gevonden")' } };
-    const r1 = solve(ex, { ...sol, C2: { raw: 'Chelsea' } }, []);
-    expect(r1.filter((x) => x.r.ok).map((x) => x.id)).toEqual(['xzoeken', 'vertzoeken', 'andere']);
-    const r2 = solve(ex, { ...sol, C2: { raw: 'Ajax' } }, []);
-    expect(r2.find((x) => x.id === 'melding')!.r.ok).toBe(true);
-    expect(r2.find((x) => x.id === 'xzoeken')!.r.ok).toBe(false);
+    // Met een bekende ploeg én met een onbekende ploeg zijn alle stappen groen.
+    expectAllOk(solve(ex, { ...sol, C2: { raw: 'Chelsea' } }, []));
+    expectAllOk(solve(ex, { ...sol, C2: { raw: 'Ajax' } }, []));
+    // Met de startploeg is stap 3 nog niet af; een foute VERT.ZOEKEN (benaderend) valt door de mand bij 'Ajax'.
+    const start = solve(ex, sol, []);
+    expect(start.find((x) => x.id === 'andere')!.r.ok).toBe(false);
+    const fout = solve(ex, { ...sol, C2: { raw: 'Ajax' }, C6: { raw: '=VERT.ZOEKEN(C2;E5:F8;2)' } }, []);
+    expect(fout.find((x) => x.id === 'vertzoeken')!.r.ok).toBe(false);
   });
 
   it('les2-totaal: volledige oplossing is groen', () => {
