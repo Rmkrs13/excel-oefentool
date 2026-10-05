@@ -630,3 +630,30 @@ code {
   background: #f6f6f6;
   border-top: 1px solid #eee;
 }
+
+/* ---------- tabbladen ---------- */
+.sheet-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 4px 8px 6px;
+  border-top: 1px solid var(--border);
+  background: var(--hdr-bg);
+}
+.sheet-tab {
+  border: 1px solid #c8c8c8;
+  border-top: none;
+  background: #fff;
+  padding: 3px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 0 0 4px 4px;
+  color: #444;
+}
+.sheet-tab.active {
+  color: var(--green);
+  font-weight: 700;
+  border-bottom: 2px solid var(--green);
+}
+.sheet-tab.editing {
+  outline: 1px dashed #3b6fd6;
+}

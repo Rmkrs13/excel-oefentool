@@ -25,10 +25,30 @@ export function functionsUsed(canonical: string): string[] {
   return names;
 }
 
-/** Is `inner` (bv. GEMIDDELDE) direct genest in `outer` (bv. AFRONDEN)? */
+/** Staat `inner(` (bv. GEMIDDELDE) ergens binnen de haakjes van een aanroep van `outer(` (bv. AFRONDEN)? */
 export function hasNested(canonical: string, outer: string, inner: string): boolean {
-  const re = new RegExp(`${escapeRe(outer)}\\(${escapeRe(inner)}\\(`);
-  return re.test(canonical);
+  const outerRe = new RegExp(`(^|[^A-Z0-9.])${escapeRe(outer)}\\(`, 'g');
+  const innerRe = new RegExp(`(^|[^A-Z0-9.])${escapeRe(inner)}\\(`);
+  for (const m of canonical.matchAll(outerRe)) {
+    const start = (m.index ?? 0) + m[0].length; // positie net na de '('
+    let depth = 1;
+    let inString = false;
+    for (let i = start; i < canonical.length; i++) {
+      const ch = canonical[i];
+      if (ch === '"') inString = !inString;
+      if (inString) continue;
+      if (ch === '(') depth++;
+      else if (ch === ')') {
+        depth--;
+        if (depth === 0) {
+          if (innerRe.test(canonical.slice(start, i).replace(/"[^"]*"/g, '""'))) return true;
+          break;
+        }
+      }
+    }
+    if (depth > 0 && innerRe.test(canonical.slice(start).replace(/"[^"]*"/g, '""'))) return true;
+  }
+  return false;
 }
 
 /** Bevat de formule deze verwijzing exact ($-tekens inbegrepen) als los token? */

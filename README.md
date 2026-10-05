@@ -16,9 +16,10 @@ npm run build     # productie-build in dist/
 
 ## Oefening toevoegen
 
-1. Maak `src/exercises/<naam>.ts` met een `Exercise` (zie `src/exercises/types.ts`): startdata als `cells`,
-   kolombreedtes, en `steps` met `checks`.
-2. Voeg de oefening toe aan `EXERCISES` in `src/exercises/index.ts`.
+1. Maak `src/exercises/<naam>.ts` met een `Exercise` (zie `src/exercises/types.ts`): één of meer tabbladen in
+   `sheets` (naam, afmetingen, startdata als `cells`, kolombreedtes) en `steps` met `checks`. Celverwijzingen in
+   checks zonder tabblad slaan op het eerste tabblad; anders schrijf je `Blad2!B5` of `'Budget 2024'!B5`.
+2. Voeg de oefening toe aan de juiste les in `LESSONS` in `src/exercises/index.ts`.
 3. Verhoog `version` als je startdata of stappen wijzigt: bewaarde voortgang van studenten wordt dan gereset.
 
 Beschikbare checks: `formula`, `value`, `usesFunction` (met `nestedIn`), `usesAbsoluteRef`, `format`,

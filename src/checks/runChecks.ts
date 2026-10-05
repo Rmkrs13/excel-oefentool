@@ -1,5 +1,5 @@
 import type { Check, CheckContext, CheckResult, Step, StepResult } from '../exercises/types';
-import { rangeCells, parseRange, toA1 } from '../engine/address';
+import { rangeCells, parseRange, splitSheetRef, toA1 } from '../engine/address';
 import { formatCode } from '../format/numberFormat';
 import { canonicalFormula, functionsUsed, hasNested, hasRef } from './formulaUtils';
 
@@ -15,8 +15,12 @@ function valueMatches(actual: unknown, expected: string | number, tolerance?: nu
   return typeof actual === 'string' && actual.trim().toLowerCase() === expected.trim().toLowerCase();
 }
 
+/** Alle cellen van een (eventueel tabblad-gekwalificeerd) bereik, met hetzelfde tabbladvoorvoegsel. */
 function cellsOf(range: string): string[] {
-  return rangeCells(parseRange(range)).map(toA1);
+  const i = range.lastIndexOf('!');
+  const prefix = i >= 0 ? range.slice(0, i + 1) : '';
+  const { ref } = splitSheetRef(range, '');
+  return rangeCells(parseRange(ref)).map((a) => prefix + toA1(a));
 }
 
 function errorResult(ctx: CheckContext, cell: string): CheckResult | null {
@@ -61,7 +65,7 @@ export function runCheck(check: Check, ctx: CheckContext): CheckResult {
       if (!f) return { ok: false, message: `${check.cell} bevat nog geen formule.` };
       if (check.nestedIn) {
         if (hasNested(f, check.nestedIn, check.fn)) return { ok: true, message: `${check.cell}: ${check.fn} zit genest in ${check.nestedIn}.` };
-        return { ok: false, partial: functionsUsed(f).includes(check.fn), message: `${check.cell}: nest ${check.fn} binnen ${check.nestedIn}, zoals =${check.nestedIn}(${check.fn}(...);0).` };
+        return { ok: false, partial: functionsUsed(f).includes(check.fn), message: `${check.cell}: zet een ${check.fn} binnen de haakjes van ${check.nestedIn}.` };
       }
       if (functionsUsed(f).includes(check.fn)) return { ok: true, message: `${check.cell} gebruikt ${check.fn}.` };
       return { ok: false, partial: true, message: `${check.cell}: gebruik de functie ${check.fn}.` };

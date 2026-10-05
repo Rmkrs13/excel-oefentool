@@ -1,11 +1,11 @@
-import { useSheetStore } from '../store/sheetStore';
+import { useSheetStore, selectActiveCells } from '../store/sheetStore';
 import { FORMAT_PRESETS, formatCode, parseFormatCode } from '../format/numberFormat';
 import { toA1 } from '../engine/address';
 import { focusGrid } from './useEditorKeys';
 
 export function Toolbar() {
   const selection = useSheetStore((s) => s.selection);
-  const activeFormat = useSheetStore((s) => s.cells[toA1(selection.anchor)]?.format);
+  const activeFormat = useSheetStore((s) => selectActiveCells(s)[toA1(selection.anchor)]?.format);
   const canUndo = useSheetStore((s) => s.history.past.length > 0);
   const canRedo = useSheetStore((s) => s.history.future.length > 0);
   const code = formatCode(activeFormat);

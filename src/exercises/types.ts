@@ -55,6 +55,8 @@ export interface DisplayValue {
 }
 
 export interface EditState {
+  /** Tabblad waarop de bewerkte cel staat (kan verschillen van het getoonde tabblad tijdens point-modus). */
+  sheet: string;
   addr: Addr;
   text: string;
   caret: number;
@@ -72,6 +74,7 @@ export interface EditState {
 }
 
 export interface SheetDef {
+  name: string;
   rows: number;
   cols: number;
   cells: Record<A1, CellData>;
@@ -84,7 +87,8 @@ export interface Exercise {
   version: number;
   title: string;
   intro?: string;
-  sheet: SheetDef;
+  /** Tabbladen, in volgorde. Celverwijzingen in checks zonder tabblad slaan op het eerste tabblad. */
+  sheets: SheetDef[];
   allowedFunctions?: string[];
   steps: Step[];
 }
@@ -98,6 +102,7 @@ export interface Step {
   checks: Check[];
 }
 
+/** Celverwijzing in checks: 'B5' (eerste tabblad) of 'Blad2!B5' / "'Budget 2024'!B5". */
 export interface CheckContext {
   raw(a1: A1): string;
   value(a1: A1): CellValue;

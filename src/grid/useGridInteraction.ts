@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type KeyboardEvent, type MouseEvent } from 'react';
-import { useSheetStore, selectionRange } from '../store/sheetStore';
+import { useSheetStore, selectionRange, selectActiveCells } from '../store/sheetStore';
 import type { Addr } from '../exercises/types';
 import { normalizeRange, rangeContains, toA1 } from '../engine/address';
 import { isRefInsertPosition } from './editing/tokens';
@@ -90,7 +90,7 @@ export function useGridInteraction() {
     if (!a) return;
     const s = useSheetStore.getState();
     if (s.editing) return;
-    s.startEdit(a, s.cells[toA1(a)]?.raw ?? '', 'edit', 'cell');
+    s.startEdit(a, selectActiveCells(s)[toA1(a)]?.raw ?? '', 'edit', 'cell');
   }, []);
 
   const onFillHandleMouseDown = useCallback((e: MouseEvent) => {
@@ -156,7 +156,7 @@ export function useGridInteraction() {
       case 'F2': {
         e.preventDefault();
         const a = s.selection.anchor;
-        s.startEdit(a, s.cells[toA1(a)]?.raw ?? '', 'edit', 'cell');
+        s.startEdit(a, selectActiveCells(s)[toA1(a)]?.raw ?? '', 'edit', 'cell');
         return;
       }
       case 'Escape':

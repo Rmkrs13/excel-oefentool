@@ -2,7 +2,8 @@ import type { A1, CellData } from '../exercises/types';
 
 export interface SavedProgress {
   version: number;
-  cells: Record<A1, CellData>;
+  /** Cellen per tabbladnaam. */
+  sheets: Record<string, Record<A1, CellData>>;
   updatedAt: number;
 }
 
@@ -13,7 +14,7 @@ export function loadProgress(exerciseId: string, version: number): SavedProgress
     const raw = localStorage.getItem(PREFIX + exerciseId);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SavedProgress;
-    if (parsed.version !== version) return null;
+    if (parsed.version !== version || !parsed.sheets) return null;
     return parsed;
   } catch {
     return null;

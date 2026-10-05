@@ -57,12 +57,7 @@ export const les1Evaluatie: Exercise = {
   title: 'Basisformules: SOM, GEMIDDELDE, MEDIAAN, MIN en MAX',
   intro:
     'De puntenlijst van klas 1 LOBR staat klaar. Vul de nummers aan, bereken totalen en statistieken met functies, en geef de getallen de juiste notatie.',
-  sheet: {
-    rows: 26,
-    cols: 9,
-    cells,
-    colWidths: { A: 18, B: 12, C: 11, D: 11, E: 11, F: 11, G: 11, H: 12 },
-  },
+  sheets: [{ name: 'Blad1', rows: 26, cols: 9, cells, colWidths: { A: 18, B: 12, C: 11, D: 11, E: 11, F: 11, G: 11, H: 12 } }],
   steps: [
     {
       id: 'vulgreep',

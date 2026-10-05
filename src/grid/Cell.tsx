@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useSheetStore } from '../store/sheetStore';
+import { useSheetStore, selectActiveCells, selectActiveValues } from '../store/sheetStore';
 import { formatValue } from '../format/numberFormat';
 import { toA1 } from '../engine/address';
 
@@ -10,10 +10,13 @@ interface Props {
 }
 
 export const Cell = memo(function Cell({ a1, row, col }: Props) {
-  const cell = useSheetStore((s) => s.cells[a1]);
-  const dv = useSheetStore((s) => s.values[a1]);
+  const cell = useSheetStore((s) => selectActiveCells(s)[a1]);
+  const dv = useSheetStore((s) => selectActiveValues(s)[a1]);
   const nextA1 = toA1({ row, col: col + 1 });
-  const nextEmpty = useSheetStore((s) => (s.exercise ? col + 1 < s.exercise.sheet.cols && !(s.cells[nextA1]?.raw) : false));
+  const nextEmpty = useSheetStore((s) => {
+    const def = s.exercise?.sheets.find((d) => d.name === s.activeSheet);
+    return def ? col + 1 < def.cols && !selectActiveCells(s)[nextA1]?.raw : false;
+  });
   const { text, align } = formatValue(dv, cell?.raw ?? '', cell?.format);
   const cls = ['cell', `al-${align}`];
   if (align === 'left' && nextEmpty && text.length > 0) cls.push('spill');

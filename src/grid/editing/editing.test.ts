@@ -54,7 +54,7 @@ describe('cycleAbsolute', () => {
 describe('matchFunctions', () => {
   const all = ['ABS', 'AANTAL', 'AANTALARG', 'AANTAL.ALS', 'AFRONDEN', 'AFRONDEN.NAAR.BOVEN', 'ALS', 'SOM', 'SOM.ALS', 'SOMPRODUCT', 'GEMIDDELDE', 'MIN', 'MAX', 'MEDIAAN'];
   it('zet aangeleerde functies eerst', () => {
-    expect(matchFunctions('a', all)).toEqual(['AFRONDEN', 'AANTALARG', 'AANTAL', 'AANTAL.ALS', 'ABS', 'AFRONDEN.NAAR.BOVEN', 'ALS']);
+    expect(matchFunctions('a', all)).toEqual(['AFRONDEN', 'AANTALARG', 'AANTAL', 'ALS', 'AANTAL.ALS', 'ABS', 'AFRONDEN.NAAR.BOVEN']);
     expect(matchFunctions('so', all)).toEqual(['SOM', 'SOM.ALS', 'SOMPRODUCT']);
     expect(matchFunctions('m', all)).toEqual(['MEDIAAN', 'MIN', 'MAX']);
   });

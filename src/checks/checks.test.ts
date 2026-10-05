@@ -1,17 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { SheetEngine } from '../engine/engine';
 import type { A1, CellData, DisplayValue } from '../exercises/types';
-import { parseA1 } from '../engine/address';
 import { makeCheckContext } from './context';
 import { autoCloseParens, canonicalFormula, functionsUsed, hasNested, hasRef } from './formulaUtils';
 import { runCheck } from './runChecks';
 
-function build(cells: Record<A1, CellData>) {
+function build(cells: Record<A1, CellData>, extra: Record<string, Record<A1, CellData>> = {}) {
   const engine = new SheetEngine();
-  engine.load(cells, 50, 12);
-  const values: Record<A1, DisplayValue> = {};
-  for (const a1 of Object.keys(cells)) values[a1] = engine.getValue(parseA1(a1));
-  return makeCheckContext(cells, values, engine);
+  const sheets = { Blad1: cells, ...extra };
+  const values = engine.load(Object.entries(sheets).map(([name, c]) => ({ name, rows: 50, cols: 12, cells: c })));
+  return makeCheckContext(sheets, values as Record<string, Record<A1, DisplayValue>>, engine, 'Blad1');
 }
 
 describe('formulaUtils', () => {
@@ -21,6 +19,10 @@ describe('formulaUtils', () => {
     expect(functionsUsed('=AFRONDEN(GEMIDDELDE(B2:D5);0)')).toEqual(['AFRONDEN', 'GEMIDDELDE']);
     expect(hasNested('=AFRONDEN(GEMIDDELDE(B2:D5);0)', 'AFRONDEN', 'GEMIDDELDE')).toBe(true);
     expect(hasNested('=AFRONDEN(B2;0)', 'AFRONDEN', 'GEMIDDELDE')).toBe(false);
+    expect(hasNested('=ALS(C5<2000;"basis";ALS(C5<2600;"gevorderd";"expert"))', 'ALS', 'ALS')).toBe(true);
+    expect(hasNested('=ALS(C5<2000;"basis";"ander")', 'ALS', 'ALS')).toBe(false);
+    expect(hasNested('=AFRONDEN(B2;0)+GEMIDDELDE(B2:B4)', 'AFRONDEN', 'GEMIDDELDE')).toBe(false);
+    expect(hasNested('=ALS(A1="ALS(";1;0)', 'ALS', 'ALS')).toBe(false);
     expect(hasRef('=B21/$G$21', '$G$21')).toBe(true);
     expect(hasRef('=B21/G21', '$G$21')).toBe(false);
     expect(hasRef('=B11*B$30', 'B$30')).toBe(true);
@@ -76,6 +78,14 @@ describe('runCheck', () => {
     const r = runCheck({ type: 'fillPattern', range: 'B34:C35', anchor: 'B34', formula: '=B11*B$30' }, ctx);
     expect(r.ok).toBe(false);
     expect(r.message).toContain('C35');
+  });
+  it('werkt met tabblad-gekwalificeerde verwijzingen', () => {
+    const ctx = build({ A1: { raw: '=Totaal!B2*2' } }, { Totaal: { B2: { raw: '21' }, B3: { raw: '=B2+1' } } });
+    expect(runCheck({ type: 'value', cell: 'A1', expect: 42 }, ctx).ok).toBe(true);
+    expect(runCheck({ type: 'value', cell: 'Totaal!B3', expect: 22 }, ctx).ok).toBe(true);
+    expect(runCheck({ type: 'formula', cell: 'A1', expect: '=Totaal!B2*2' }, ctx).ok).toBe(true);
+    expect(runCheck({ type: 'rangeFilled', range: 'Totaal!B2:B3', values: [21, 22] }, ctx).ok).toBe(true);
+    expect(runCheck({ type: 'fillPattern', range: 'Totaal!B3:B3', anchor: 'Totaal!B3', formula: '=B2+1' }, ctx).ok).toBe(true);
   });
   it('meldt fouten', () => {
     const ctx = build({ A1: { raw: '=1/0' } });

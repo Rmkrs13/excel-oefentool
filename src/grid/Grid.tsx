@@ -6,11 +6,14 @@ import { SelectionOverlay } from './SelectionOverlay';
 import { HEADER_HEIGHT, HEADER_WIDTH, ROW_HEIGHT, makeGeometry } from './geometry';
 import { colToLetters, toA1 } from '../engine/address';
 import { useGridInteraction } from './useGridInteraction';
+import { SheetTabs } from './SheetTabs';
 
 export function Grid() {
   const exercise = useSheetStore((s) => s.exercise);
+  const activeSheet = useSheetStore((s) => s.activeSheet);
   const selection = useSheetStore((s) => s.selection);
-  const geometry = useMemo(() => makeGeometry(exercise), [exercise]);
+  const def = useMemo(() => exercise?.sheets.find((d) => d.name === activeSheet), [exercise, activeSheet]);
+  const geometry = useMemo(() => makeGeometry(def), [def]);
   const { onMouseDown, onDoubleClick, onFillHandleMouseDown, onKeyDown } = useGridInteraction();
 
   const rows = useMemo(() => {
@@ -31,7 +34,8 @@ export function Grid() {
   const template = `${HEADER_WIDTH}px ${geometry.colWidths.map((w) => `${w}px`).join(' ')}`;
 
   return (
-    <div className="grid-scroll" tabIndex={0} onKeyDown={onKeyDown}>
+    <>
+    <div className="grid-scroll" tabIndex={0} onKeyDown={onKeyDown} key={activeSheet}>
       <div
         className="grid"
         style={{ gridTemplateColumns: template, width: HEADER_WIDTH + geometry.totalWidth }}
@@ -60,5 +64,7 @@ export function Grid() {
         </div>
       </div>
     </div>
+    <SheetTabs />
+    </>
   );
 }

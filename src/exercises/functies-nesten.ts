@@ -27,7 +27,7 @@ export const functiesNesten: Exercise = {
   version: 1,
   title: 'Functies nesten: AFRONDEN en GEMIDDELDE',
   intro: 'De omzet van drie winkels over vier maanden. Bereken het gemiddelde en rond het af met een geneste functie.',
-  sheet: { rows: 8, cols: 8, cells, colWidths: { F: 20 } },
+  sheets: [{ name: 'Blad1', rows: 8, cols: 8, cells, colWidths: { F: 20 } }],
   steps: [
     {
       id: 'gemiddelde',

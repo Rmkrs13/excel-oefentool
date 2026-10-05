@@ -9,4 +9,7 @@ export const FUNCTION_HELP: Record<string, string> = {
   AANTALARG: 'Telt niet-lege cellen',
   AANTAL: 'Telt cellen met een getal',
   ALS: 'Voorwaarde: als ... dan ... anders',
+  'AANTAL.ALS': 'Telt cellen die aan een voorwaarde voldoen',
+  'X.ZOEKEN': 'Zoekt een waarde op en geeft het resultaat uit een ander bereik',
+  'VERT.ZOEKEN': 'Zoekt in de eerste kolom van een tabel',
 };

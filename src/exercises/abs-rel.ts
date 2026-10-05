@@ -24,7 +24,7 @@ export const absRel: Exercise = {
   version: 1,
   title: 'Absoluut en relatief verwijzen',
   intro: 'Eén formule schrijven en doortrekken: dat lukt alleen als je weet welke verwijzing mee mag schuiven en welke vast moet staan met $.',
-  sheet: { rows: 12, cols: 12, cells, colWidths: { A: 18, C: 15, G: 11 } },
+  sheets: [{ name: 'Blad1', rows: 12, cols: 12, cells, colWidths: { A: 18, C: 15, G: 11 } }],
   steps: [
     {
       id: 'totaal',

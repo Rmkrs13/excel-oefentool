@@ -1,4 +1,4 @@
-import type { Addr, Exercise, Range } from '../exercises/types';
+import type { Addr, Range, SheetDef } from '../exercises/types';
 import { colToLetters, normalizeRange } from '../engine/address';
 
 export const ROW_HEIGHT = 24;
@@ -20,12 +20,12 @@ export function charsToPx(chars: number): number {
   return Math.round(chars * 7 + 8);
 }
 
-export function makeGeometry(ex: Exercise | null): Geometry {
-  const rows = ex?.sheet.rows ?? 40;
-  const cols = ex?.sheet.cols ?? 12;
+export function makeGeometry(def: SheetDef | undefined): Geometry {
+  const rows = def?.rows ?? 40;
+  const cols = def?.cols ?? 12;
   const colWidths: number[] = [];
   for (let c = 0; c < cols; c++) {
-    const w = ex?.sheet.colWidths?.[colToLetters(c)];
+    const w = def?.colWidths?.[colToLetters(c)];
     colWidths.push(w ? charsToPx(w) : DEFAULT_COL_WIDTH);
   }
   const colOffsets: number[] = [];

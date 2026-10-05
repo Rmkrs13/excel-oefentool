@@ -10,7 +10,7 @@ interface Props {
 export function SelectionOverlay({ geometry, onFillHandleMouseDown }: Props) {
   const selection = useSheetStore((s) => s.selection);
   const fillDrag = useSheetStore((s) => s.fillDrag);
-  const editing = useSheetStore((s) => s.editing);
+  const editing = useSheetStore((s) => (s.editing && s.editing.sheet === s.activeSheet ? s.editing : null));
   const range = selectionRange(selection);
   const rect = rangeRect(geometry, range);
   const active = rangeRect(geometry, { start: selection.anchor, end: selection.anchor });

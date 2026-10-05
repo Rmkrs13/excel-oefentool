@@ -76,3 +76,22 @@ export function rangeSize(r: Range): { rows: number; cols: number } {
   const n = normalizeRange(r);
   return { rows: n.end.row - n.start.row + 1, cols: n.end.col - n.start.col + 1 };
 }
+
+/** Splitst "'Budget 2024'!B5" of "Blad2!B5:C9" in tabbladnaam en verwijzing. Zonder '!' geldt `defaultSheet`. */
+export function splitSheetRef(ref: string, defaultSheet: string): { sheet: string; ref: string } {
+  const i = ref.lastIndexOf('!');
+  if (i < 0) return { sheet: defaultSheet, ref };
+  let sheet = ref.slice(0, i);
+  if (sheet.startsWith("'") && sheet.endsWith("'")) sheet = sheet.slice(1, -1).replace(/''/g, "'");
+  return { sheet, ref: ref.slice(i + 1) };
+}
+
+/** Tabbladnaam zoals ze in een formule moet staan (met aanhalingstekens als dat nodig is). */
+export function quoteSheetName(name: string): string {
+  return /^[A-Za-z_][A-Za-z0-9_.]*$/.test(name) ? name : `'${name.replace(/'/g, "''")}'`;
+}
+
+/** Verwijzing naar `ref` op tabblad `sheet`, gezien vanuit `fromSheet`. */
+export function qualifyRef(sheet: string, ref: string, fromSheet: string): string {
+  return sheet.toLowerCase() === fromSheet.toLowerCase() ? ref : `${quoteSheetName(sheet)}!${ref}`;
+}

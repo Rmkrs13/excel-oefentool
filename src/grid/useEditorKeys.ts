@@ -5,7 +5,7 @@ import { functionTokenAtCaret, isRefInsertPosition, refTokenAtCaret } from './ed
 import { matchFunctions, TAUGHT_FUNCTIONS } from './editing/autocomplete';
 import { cycleAbsolute } from './editing/f4';
 import { allFunctionNames } from '../engine/hf';
-import { rangeToA1 } from '../engine/address';
+import { qualifyRef, rangeToA1 } from '../engine/address';
 
 /** Berekent de autocomplete-toestand voor een tekst/caret. */
 export function computeAutocomplete(text: string, caret: number, allowed?: string[]): EditState['autocomplete'] {
@@ -124,11 +124,11 @@ export function useEditorKeys(inputRef: RefObject<HTMLInputElement | null>, sour
         // Point-modus met het toetsenbord: een verwijzing aanwijzen.
         if (ed.text.startsWith('=') && (ed.pointCursor || isRefInsertPosition(ed.text, ed.caret))) {
           e.preventDefault();
-          const ex = s.exercise;
-          const from = ed.pointCursor ?? ed.addr;
+          const def = s.exercise?.sheets.find((d) => d.name === s.activeSheet);
+          const from = ed.pointCursor ?? (s.activeSheet === ed.sheet ? ed.addr : { row: 0, col: 0 });
           const cursor = {
-            row: Math.min(Math.max(0, from.row + dr), (ex?.sheet.rows ?? 50) - 1),
-            col: Math.min(Math.max(0, from.col + dc), (ex?.sheet.cols ?? 12) - 1),
+            row: Math.min(Math.max(0, from.row + dr), (def?.rows ?? 50) - 1),
+            col: Math.min(Math.max(0, from.col + dc), (def?.cols ?? 12) - 1),
           };
           // Shift+pijltje: bereik uitbreiden vanaf het anker (zoals in Excel).
           const anchor = e.shiftKey && ed.pointCursor ? (ed.pointAnchor ?? ed.pointCursor) : cursor;
@@ -175,6 +175,10 @@ export function insertRef(ref: string, cursor?: { row: number; col: number }, an
   s.updateEdit({ text, caret: start + ref.length, pointRef: { start, end: start + ref.length }, pointCursor: cursor, pointAnchor: anchor ?? cursor, autocomplete: undefined });
 }
 
+/** Voegt een (bereik)verwijzing in; op een ander tabblad dan de bewerkte cel wordt ze gekwalificeerd ('Blad'!A1). */
 export function insertRangeRef(anchor: { row: number; col: number }, focus: { row: number; col: number }): void {
-  insertRef(rangeToA1({ start: anchor, end: focus }), focus, anchor);
+  const s = useSheetStore.getState();
+  const ref = rangeToA1({ start: anchor, end: focus });
+  const qualified = s.editing ? qualifyRef(s.activeSheet, ref, s.editing.sheet) : ref;
+  insertRef(qualified, focus, anchor);
 }
