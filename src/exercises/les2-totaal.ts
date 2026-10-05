@@ -187,16 +187,17 @@ export const les2Totaal: Exercise = {
     {
       id: 'woonplaats',
       title: 'Woonplaats opzoeken op een ander tabblad',
-      text: 'Op het tabblad **VZ** staat per student de woonplaats, in een andere volgorde. Zoek in **K5** de woonplaats op aan de hand van de achternaam in B5, met **X.ZOEKEN** of **VERT.ZOEKEN** (exact zoeken!). Je mag niets aan de verwijstabel veranderen. Trek door tot **K18**.',
-      hint: '`=X.ZOEKEN(B5;VZ!$B$3:$B$16;VZ!$D$3:$D$16)` of `=VERT.ZOEKEN(B5;VZ!$B$3:$D$16;3;ONWAAR)`.',
+      text: 'Op het tabblad **VZ** staat per student de woonplaats, in een andere volgorde. Zoek in **K5** de woonplaats op aan de hand van de achternaam in B5 met **X.ZOEKEN**: zoek B5 in de achternamen op VZ en geef de woonplaats terug. Zet beide bereiken vast met `$`. Je mag niets aan de verwijstabel veranderen. Trek door tot **K18**.',
+      hint: '`=X.ZOEKEN(B5;VZ!$B$3:$B$16;VZ!$D$3:$D$16)`. Klik op het tabblad VZ, sleep over B3:B16 en druk op F4; typ `;`, sleep over D3:D16 en druk opnieuw op F4.',
       checks: [
+        { type: 'usesFunction', cell: 'K5', fn: 'X.ZOEKEN' },
         {
           type: 'predicate',
-          label: 'K5 zoekt op het tabblad VZ met X.ZOEKEN of VERT.ZOEKEN',
-          message: 'K5 moet met X.ZOEKEN of VERT.ZOEKEN zoeken in de tabel op het tabblad VZ.',
+          label: 'K5 zoekt in de tabel op het tabblad VZ, met absolute verwijzingen',
+          message: 'K5 moet zoeken in de kolommen op het tabblad VZ, vastgezet met $ (bv. VZ!$B$3:$B$16).',
           test: (ctx) => {
             const f = ctx.formula('K5') ?? '';
-            return f.includes('VZ!') && (f.includes('X.ZOEKEN(') || f.includes('VERT.ZOEKEN('));
+            return f.includes('VZ!') && /\$[A-Z]\$\d+:\$[A-Z]\$\d+/.test(f);
           },
         },
         { type: 'rangeFilled', range: 'K5:K18', values: plaatsen },

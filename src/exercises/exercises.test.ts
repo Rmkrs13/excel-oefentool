@@ -135,8 +135,9 @@ describe('oefeningen', () => {
         { anchor: 'D20', formula: '=MEDIAAN(D5:D18)', range: 'D20:G20' },
       ]),
     );
-    // VERT.ZOEKEN-variant voor de woonplaats werkt ook
+    // VERT.ZOEKEN voor de woonplaats wordt niet aanvaard: de oefening vraagt X.ZOEKEN
     const alt = solve(ex, {}, [{ anchor: 'K5', formula: '=VERT.ZOEKEN(B5;VZ!$B$3:$D$16;3;ONWAAR)', range: 'K5:K18' }]);
-    expect(alt.find((x) => x.id === 'woonplaats')!.r.ok).toBe(true);
+    expect(alt.find((x) => x.id === 'woonplaats')!.r.ok).toBe(false);
+    expect(alt.find((x) => x.id === 'woonplaats')!.r.partial).toBe(true);
   });
 });
