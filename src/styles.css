@@ -208,6 +208,9 @@ code {
   text-decoration: none;
   opacity: 0.9;
 }
+.exercise-page.embed .ex-header {
+  padding: 6px 12px;
+}
 .btn {
   border: 1px solid rgba(255, 255, 255, 0.6);
   background: transparent;

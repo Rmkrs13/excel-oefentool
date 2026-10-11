@@ -25,6 +25,11 @@ npm run build     # productie-build in dist/
 Beschikbare checks: `formula`, `value`, `usesFunction` (met `nestedIn`), `usesAbsoluteRef`, `format`,
 `isText`, `rangeFilled`, `fillPattern` (één formule doortrekken over een bereik) en `predicate`.
 
+## Oefening insluiten
+
+Voeg `?embedmode` toe aan de link van een oefening, bv. `https://<site>/oefening/abs-rel?embedmode`. De pagina toont dan
+enkel die oefening, zonder terugknop naar het overzicht. Handig om één oefening in een iframe of een leerplatform te plaatsen.
+
 ## Hosten op Netlify
 
 `netlify.toml` staat klaar (build `npm run build`, publish `dist`, SPA-redirect). Koppel de repo aan Netlify
