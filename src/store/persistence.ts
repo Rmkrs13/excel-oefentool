@@ -92,3 +92,28 @@ export function saveLessonOpen(lessonId: string, open: boolean): void {
     /* negeren */
   }
 }
+
+/** Voor de statistieken: is deze oefening in de huidige poging al als afgemaakt gemeld? */
+export function wasCompletionTracked(exerciseId: string, version: number): boolean {
+  try {
+    return localStorage.getItem(PREFIX + 'completed:' + exerciseId) === String(version);
+  } catch {
+    return false;
+  }
+}
+
+export function markCompletionTracked(exerciseId: string, version: number): void {
+  try {
+    localStorage.setItem(PREFIX + 'completed:' + exerciseId, String(version));
+  } catch {
+    /* negeren */
+  }
+}
+
+export function clearCompletionTracked(exerciseId: string): void {
+  try {
+    localStorage.removeItem(PREFIX + 'completed:' + exerciseId);
+  } catch {
+    /* negeren */
+  }
+}

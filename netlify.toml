@@ -5,6 +5,17 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Functions zijn bereikbaar via /api/track en /api/stats (zie `config.path` in de functions).
+# De SPA-redirect hieronder mag die paden niet opvangen.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

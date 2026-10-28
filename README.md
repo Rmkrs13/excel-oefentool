@@ -32,8 +32,39 @@ enkel die oefening, zonder terugknop naar het overzicht. Handig om één oefenin
 
 ## Hosten op Netlify
 
-`netlify.toml` staat klaar (build `npm run build`, publish `dist`, SPA-redirect). Koppel de repo aan Netlify
-of deploy vanuit de map met `netlify deploy --prod`.
+`netlify.toml` staat klaar (build `npm run build`, publish `dist`, SPA-redirect, functions in `netlify/functions`).
+Koppel de repo aan Netlify of deploy vanuit de map met `netlify deploy --prod`.
+
+## Statistieken (/stats)
+
+De tool telt anoniem hoe er geoefend wordt. Elke browser krijgt een willekeurig id in localStorage; er worden geen
+namen, accounts of IP-adressen bewaard. Per gebruiker wordt bijgehouden: bezoeken (met verwijzende site, en of de tool
+in een iframe of met `?embedmode` draait), per oefening geopend / stappen juist / afgemaakt / resets (met timestamps), en in
+welke uren er activiteit was (Belgische tijd). Een oefening telt één keer als afgemaakt per poging: een reset start een nieuwe
+poging, een cel breken en herstellen niet. Op `/stats` zie je per oefening zowel het aantal gebruikers dat ze afmaakte als het
+totale aantal keer afgemaakt. De gegevens staan in Netlify Blobs (store `analytics`, één blob per gebruiker).
+
+- `netlify/functions/track.mts` ontvangt events van de browser op `/api/track`.
+- `netlify/functions/stats.mts` geeft de (geanonimiseerde) gegevens terug op `/api/stats`, enkel met het juiste wachtwoord.
+- De pagina `/stats` toont tegels, een tabel per oefening (klik op een rij voor de stappen), actieve gebruikers per dag,
+  een heatmap per weekdag en uur, en de herkomst van de bezoeken. Een periodefilter staat bovenaan. Onderaan staat een
+  knop die alle statistieken wist (met bevestiging; `DELETE /api/stats`).
+
+Instellen: zet op Netlify de omgevingsvariabele `STATS_PASSWORD` (Site configuration → Environment variables) en
+deploy opnieuw. Zonder die variabele weigert `/api/stats` alles. Lokaal testen:
+
+```bash
+STATS_PASSWORD=test npm run dev:netlify   # Vite + functions + lokale Blobs-sandbox op http://localhost:8888
+```
+
+Goed om te weten:
+
+- De gewone `npm run dev` heeft geen functions; events worden dan stil genegeerd.
+- Een pagina die de tool insluit kan via haar Referrer-Policy haar adres verbergen; het bezoek telt dan als "direct",
+  maar "in een iframe" wordt wel geteld.
+- Chrome en Safari geven een iframe een aparte opslag per inbeddende site. Een student die zowel via een leerplatform
+  als rechtstreeks oefent, telt daardoor als twee gebruikers.
+- Bezoeken aan `/stats` zelf worden niet geteld.
 
 ## Licentie
 

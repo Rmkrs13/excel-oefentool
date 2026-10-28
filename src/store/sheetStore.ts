@@ -7,9 +7,20 @@ import { adjustDecimals as adjustDecimalsSpec } from '../format/numberFormat';
 import { computeSeries } from '../format/series';
 import { findSheetKey, makeCheckContext, type SheetsCells, type SheetsValues } from '../checks/context';
 import { runStep } from '../checks/runChecks';
-import { debounce, loadProgress, saveProgress, clearProgress, saveSummary, clearSummary } from './persistence';
+import {
+  debounce,
+  loadProgress,
+  saveProgress,
+  clearProgress,
+  saveSummary,
+  clearSummary,
+  wasCompletionTracked,
+  markCompletionTracked,
+  clearCompletionTracked,
+} from './persistence';
 import { explainError } from '../engine/hf';
 import { autoCloseParens } from '../checks/formulaUtils';
+import { track, trackHeartbeat } from '../analytics/track';
 
 export interface Selection {
   anchor: Addr;
@@ -101,6 +112,19 @@ export const useSheetStore = create<SheetStore>((set, get) => {
     return out;
   }
 
+  /** Anonieme statistieken: stappen die juist worden en de overgang naar 'alles juist'. */
+  function emitProgress(prev: Record<string, StepResult>, next: Record<string, StepResult>, ex: Exercise) {
+    for (const step of ex.steps) {
+      if (next[step.id]?.ok && !prev[step.id]?.ok) track({ type: 'step', exercise: ex.id, step: step.id });
+    }
+    const count = (r: Record<string, StepResult>) => ex.steps.filter((st) => r[st.id]?.ok).length;
+    // Eén voltooiing per poging: een reset (of een nieuwe versie van de oefening) start een nieuwe poging.
+    if (count(next) === ex.steps.length && count(prev) < ex.steps.length && !wasCompletionTracked(ex.id, ex.version)) {
+      markCompletionTracked(ex.id, ex.version);
+      track({ type: 'complete', exercise: ex.id });
+    }
+  }
+
   function loadIntoEngine(ex: Exercise, sheets: Snapshot): SheetsValues {
     return getEngine().load(ex.sheets.map((d) => ({ name: d.name, rows: d.rows, cols: d.cols, cells: sheets[d.name] ?? {} })));
   }
@@ -109,7 +133,9 @@ export const useSheetStore = create<SheetStore>((set, get) => {
     const ex = get().exercise;
     if (!ex) return;
     const values = loadIntoEngine(ex, sheets);
-    set({ sheets, values, stepResults: runAllChecks(sheets, values, ex) });
+    const stepResults = runAllChecks(sheets, values, ex);
+    emitProgress(get().stepResults, stepResults, ex);
+    set({ sheets, values, stepResults });
     persist(ex.id, ex.version, sheets);
   }
 
@@ -133,6 +159,7 @@ export const useSheetStore = create<SheetStore>((set, get) => {
       const sheets: Snapshot = {};
       for (const d of sheetDefsToCells(ex.sheets)) sheets[d.name] = saved?.sheets[d.name] ? saved.sheets[d.name] : structuredClone(d.cells);
       const values = loadIntoEngine(ex, sheets);
+      track({ type: 'open', exercise: ex.id });
       set({
         exercise: ex,
         sheets,
@@ -272,6 +299,8 @@ export const useSheetStore = create<SheetStore>((set, get) => {
       const values: SheetsValues = { ...get().values };
       for (const c of changes) values[c.sheet] = { ...(values[c.sheet] ?? {}), [c.a1]: c.value };
       const stepResults = runAllChecks(next, values, exercise);
+      emitProgress(get().stepResults, stepResults, exercise);
+      trackHeartbeat(exercise.id);
       set({
         sheets: next,
         values,
@@ -396,6 +425,8 @@ export const useSheetStore = create<SheetStore>((set, get) => {
       if (!ex) return;
       clearProgress(ex.id);
       clearSummary(ex.id);
+      clearCompletionTracked(ex.id);
+      track({ type: 'reset', exercise: ex.id });
       get().loadExercise(ex);
     },
 

@@ -44,7 +44,7 @@ export function OverviewPage() {
     <div className="page overview">
       <header className="ov-header">
         <h1>Excel oefenen</h1>
-        <p>Oefen de technieken uit de les in een werkblad in je browser. Je werk wordt automatisch bewaard in deze browser.</p>
+        <p>Oefen de technieken uit de les in een werkblad in je browser. Je werk wordt automatisch bewaard in deze browser. We tellen anoniem (zonder naam of account) hoeveel er geoefend wordt.</p>
         <p className="ov-note">
           Deze tool dekt enkel de belangrijkste logica en formules. Lay-out, celopmaak, grafieken en draaitabellen kun je hier niet
           oefenen, maar ze zijn wel belangrijke leerstof voor het examen: oefen die in Excel zelf.
