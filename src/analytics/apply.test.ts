@@ -34,6 +34,14 @@ describe('applyEvents', () => {
     expect(doc.lastSeen).toBe(T0);
     expect(doc.visits).toBe(1);
     expect(doc.sources).toEqual({ direct: 1 });
+    expect(doc.activity).toEqual({}); // een bezoek is nog geen oefenen
+  });
+
+  it('openen zonder iets in te vullen telt niet als activiteit, invullen wel', () => {
+    let doc = applyEvents(null, 'u1', [{ type: 'open', exercise: 'abs-rel' }], T0);
+    expect(doc.activity).toEqual({});
+    expect(doc.exercises['abs-rel'].opened).toBe(T0);
+    doc = applyEvents(doc, 'u1', [{ type: 'heartbeat', exercise: 'abs-rel' }], T0 + 1000);
     expect(doc.activity).toEqual({ '2026-10-28 14': 1 });
   });
 
@@ -66,7 +74,7 @@ describe('applyEvents', () => {
     expect(ex.resets).toBe(1);
     expect(ex.resetAt).toEqual([T0 + 4000]);
     expect(doc.lastSeen).toBe(T0 + 5000);
-    expect(doc.activity['2026-10-28 14']).toBe(6);
+    expect(doc.activity['2026-10-28 14']).toBe(5); // het openen telt niet mee
   });
 
   it('wijzigt het oorspronkelijke document niet', () => {

@@ -125,7 +125,7 @@ export function StatsPage() {
             ← Overzicht
           </Link>
           <h1>Statistieken</h1>
-          <p>Anoniem gebruik van de oefentool. Tijden in Belgische tijd.</p>
+          <p>Anoniem gebruik van de oefentool. Een gebruiker telt als actief zodra die iets invult in een oefening; een pagina laden telt niet. Tijden in Belgische tijd.</p>
         </div>
         {key && (
           <div className="stats-actions">
@@ -266,12 +266,13 @@ export function StatsPage() {
 
 function Tiles({ agg, allTime }: { agg: Aggregate; allTime: boolean }) {
   const tiles: Array<[string, number | string, string?]> = [
-    ['Unieke gebruikers', agg.uniqueUsers, 'ooit'],
-    ['Actieve gebruikers', agg.activeUsers, allTime ? undefined : 'in de periode'],
+    ['Unieke gebruikers', agg.uniqueUsers, 'ooit iets ingevuld'],
+    ['Actieve gebruikers', agg.activeUsers, allTime ? 'iets ingevuld' : 'iets ingevuld in de periode'],
     ['Nieuwe gebruikers', agg.newUsers, allTime ? undefined : 'in de periode'],
-    ['Bezoeken', agg.visits],
+    ['Bezoeken', agg.visits, 'van actieve gebruikers'],
     ['Afgewerkte oefeningen', agg.totalCompletions],
     ['Resets', agg.totalResets],
+    ['Alleen gekeken', agg.viewersOnly, 'nooit iets ingevuld'],
   ];
   return (
     <div className="tiles">

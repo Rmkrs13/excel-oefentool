@@ -99,7 +99,7 @@ describe('aggregate', () => {
     const a = aggregate([u1, u2], { from: '2026-10-28', to: '2026-10-28' });
     expect(a.uniqueUsers).toBe(2);
     expect(a.activeUsers).toBe(1);
-    expect(a.newUsers).toBe(0);
+    expect(a.newUsers).toBe(1); // eerste oefenmoment van u1 valt op 28 oktober
     expect(a.perExercise['abs-rel'].opened).toBe(1);
     expect(a.perExercise['abs-rel'].completed).toBe(1);
     expect(a.perExercise['abs-rel'].completions).toBe(1);
@@ -124,6 +124,21 @@ describe('aggregate', () => {
     expect(a.perExercise['abs-rel'].completions).toBe(3);
     expect(a.perExercise['abs-rel'].resets).toBe(2);
     expect(aggregate([old], { from: '2026-10-25' }).perExercise['abs-rel'].completions).toBe(0);
+  });
+
+  it('wie enkel keek en nooit iets invulde, telt niet mee', () => {
+    const viewer = user({ exercises: { 'abs-rel': { opened: T('2026-10-28T10:00:00+01:00'), completions: 0, resets: 0, steps: {} } } });
+    const a = aggregate([u1, viewer]);
+    expect(a.uniqueUsers).toBe(1);
+    expect(a.viewersOnly).toBe(1);
+    expect(a.activeUsers).toBe(1);
+    expect(a.visits).toBe(1);
+    expect(a.perExercise['abs-rel'].opened).toBe(1);
+  });
+
+  it('nieuwe gebruikers: eerste oefenmoment in de periode', () => {
+    expect(aggregate([u1, u2], { from: '2026-10-28', to: '2026-10-29' }).newUsers).toBe(1);
+    expect(aggregate([u1, u2], { from: '2026-10-29', to: '2026-10-29' }).newUsers).toBe(0);
   });
 
   it('lege invoer', () => {

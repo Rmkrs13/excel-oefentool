@@ -30,11 +30,13 @@ export interface DayAggregate {
 }
 
 export interface Aggregate {
-  /** Alle gebruikers ooit (los van de periode). */
+  /** Gebruikers die ooit iets invulden in een oefening (los van de periode). */
   uniqueUsers: number;
-  /** Gebruikers met activiteit in de periode. */
+  /** Gebruikers die de site enkel bekeken en nooit iets invulden (los van de periode). */
+  viewersOnly: number;
+  /** Gebruikers die in de periode iets invulden in een oefening. */
   activeUsers: number;
-  /** Gebruikers die voor het eerst gezien werden in de periode. */
+  /** Gebruikers die in de periode voor het eerst iets invulden. */
   newUsers: number;
   visits: number;
   totalCompletions: number;
@@ -92,6 +94,8 @@ export function aggregate(users: AnonUserDoc[], period: Period = {}, tz = 'Europ
   const activePerDay = new Map<string, number>();
   const completionsPerDay = new Map<string, number>();
   const sources = new Map<string, number>();
+  let uniqueUsers = 0;
+  let viewersOnly = 0;
   let activeUsers = 0;
   let newUsers = 0;
   let visits = 0;
@@ -108,19 +112,26 @@ export function aggregate(users: AnonUserDoc[], period: Period = {}, tz = 'Europ
   };
 
   for (const u of users) {
+    const buckets = Object.keys(u.activity).sort();
+    if (buckets.length === 0) {
+      viewersOnly++;
+      continue; // enkel gekeken, nooit geoefend: telt nergens mee
+    }
+    uniqueUsers++;
     let active = false;
     const daysSeen = new Set<string>();
-    for (const [bucket, count] of Object.entries(u.activity)) {
+    for (const bucket of buckets) {
       const [day, hour] = bucket.split(' ');
       if (!inPeriod(day, period)) continue;
       active = true;
       daysSeen.add(day);
       const h = Number(hour);
-      if (h >= 0 && h < 24) heatmap[weekdayOf(day)][h] += count;
+      if (h >= 0 && h < 24) heatmap[weekdayOf(day)][h] += u.activity[bucket];
     }
     for (const day of daysSeen) activePerDay.set(day, (activePerDay.get(day) ?? 0) + 1);
     if (active) activeUsers++;
-    if (tsIn(u.firstSeen)) newUsers++;
+    // Nieuw = eerste oefenmoment valt in de periode.
+    if (inPeriod(buckets[0].split(' ')[0], period)) newUsers++;
 
     // Bezoeken en herkomst zijn niet per dag bewaard: tellen we voor gebruikers met activiteit in de periode.
     if (active) {
@@ -167,7 +178,8 @@ export function aggregate(users: AnonUserDoc[], period: Period = {}, tz = 'Europ
   }
 
   return {
-    uniqueUsers: users.length,
+    uniqueUsers,
+    viewersOnly,
     activeUsers,
     newUsers,
     visits,

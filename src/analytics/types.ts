@@ -39,7 +39,7 @@ export interface UserDoc {
   firstSeen: number;
   lastSeen: number;
   visits: number;
-  /** Uurvak in Europe/Brussels ("2026-10-28 14") -> aantal events in dat uur. */
+  /** Uurvak in Europe/Brussels ("2026-10-28 14") -> aantal oefenmomenten in dat uur (iets ingevuld, stap juist, afgemaakt, reset). Een pagina laden telt niet. */
   activity: Record<string, number>;
   /** Referrer-host ("direct", "canvas.instructure.com") -> aantal bezoeken. */
   sources: Record<string, number>;

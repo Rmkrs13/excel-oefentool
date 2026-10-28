@@ -57,7 +57,8 @@ function exerciseStats(doc: UserDoc, id: string, now: number): ExerciseStats {
 export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent[], now: number, tz = TIMEZONE): UserDoc {
   const next: UserDoc = doc ? structuredClone(doc) : emptyDoc(uid, now);
   next.lastSeen = Math.max(next.lastSeen, now);
-  let touched = false;
+  /** Enkel echt oefenen (iets invullen, een stap juist, afmaken, resetten) telt als activiteit; een pagina laden niet. */
+  let practiced = false;
 
   for (const ev of events) {
     if (!ev || typeof ev !== 'object') continue;
@@ -68,21 +69,19 @@ export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent
         next.sources[host] = (next.sources[host] ?? 0) + 1;
         if (ev.embedded) next.embedded++;
         if (ev.embedmode) next.embedmode++;
-        touched = true;
         break;
       }
       case 'open': {
         const id = cleanId(ev.exercise);
         if (!id) continue;
         exerciseStats(next, id, now);
-        touched = true;
         break;
       }
       case 'heartbeat': {
         const id = cleanId(ev.exercise);
         if (!id) continue;
         exerciseStats(next, id, now);
-        touched = true;
+        practiced = true;
         break;
       }
       case 'step': {
@@ -91,7 +90,7 @@ export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent
         if (!id || !step) continue;
         const ex = exerciseStats(next, id, now);
         ex.steps[step] ??= now;
-        touched = true;
+        practiced = true;
         break;
       }
       case 'complete': {
@@ -101,7 +100,7 @@ export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent
         ex.completed ??= now;
         ex.completions++;
         ex.completedAt = pushTs(ex.completedAt, now);
-        touched = true;
+        practiced = true;
         break;
       }
       case 'reset': {
@@ -110,7 +109,7 @@ export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent
         const ex = exerciseStats(next, id, now);
         ex.resets++;
         ex.resetAt = pushTs(ex.resetAt, now);
-        touched = true;
+        practiced = true;
         break;
       }
       default:
@@ -118,7 +117,7 @@ export function applyEvents(doc: UserDoc | null, uid: string, events: TrackEvent
     }
   }
 
-  if (touched) {
+  if (practiced) {
     const bucket = hourBucket(now, tz);
     next.activity[bucket] = (next.activity[bucket] ?? 0) + 1;
   }
